@@ -1,8 +1,12 @@
 const Router = require('express').Router;
 const router = Router();
+const controller = require('../controllers')
 
 router.get('/', (req, res) => {
-    res.render("index"); // render file index.ejs trong thư mục views
+    res.render("index");
 });
+router.get('/subjects', controller.getSubjects);
+router.get('/subjects/:id', controller.getSubject);
+
 
 module.exports = router;
