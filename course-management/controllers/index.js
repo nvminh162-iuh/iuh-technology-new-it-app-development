@@ -6,7 +6,7 @@ const subjectsController = {
     getSubjects: async (req, res) => {
         try {
             const subjects = await subjectsModel.getAll();
-            return res.status(200).json(subjects);
+            return res.render('index', { subjects });
         } catch (error) {
             console.log(error);
             res.status(500).send('Error getting subjects');
@@ -18,9 +18,9 @@ const subjectsController = {
             const { id } = req.params;
             const subject = await subjectsModel.getById(id);
             if (subject) {
-                return res.status(200).json(subject);
+                return res.render('edit', { subject });
             }
-            return res.status(404).send('Subject not found');
+            res.redirect('/subjects');
         } catch (error) {
             console.log(error);
             res.status(500).send('Error getting subject');
@@ -31,14 +31,14 @@ const subjectsController = {
         const image = req.file;
         try {
             const imageUrl = await uploadFile(image);
-            const subject = await subjectsModel.create({
+            await subjectsModel.create({
                 name,
                 type,
                 semester,
                 faculty,
                 image: imageUrl,
             });
-            return res.status(200).json(subject);
+            res.redirect('/subjects');
         } catch (error) {
             console.log(error);
             res.status(500).send('Error creating subject');
@@ -54,7 +54,7 @@ const subjectsController = {
             // Nếu có file mới thì upload, không thì giữ image cũ từ req.body
             const imageUrl = image ? await uploadFile(image) : req.body.image;
 
-            const updatedSubject = await subjectsModel.update(id, {
+            await subjectsModel.update(id, {
                 name,
                 type,
                 semester,
@@ -62,7 +62,7 @@ const subjectsController = {
                 image: imageUrl,
             });
 
-            return res.status(200).json(updatedSubject);
+            res.redirect('/subjects');
         } catch (error) {
             console.log(error);
             res.status(500).send('Error updating subject');
@@ -74,10 +74,10 @@ const subjectsController = {
             const { id } = req.params;
             const existed = await subjectsModel.getById(id);
             if (!existed) {
-                return res.status(404).send('Subject not found');
+                return res.redirect('/subjects');
             }
             await subjectsModel.delete(id, existed.name);
-            return res.status(200).json({ message: 'Subject deleted successfully' });
+            res.redirect("/subjects");
         } catch (error) {
             console.log(error);
             res.status(500).send('Error deleting subject');

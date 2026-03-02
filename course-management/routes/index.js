@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
 router.get('/subjects', controller.getSubjects);
 router.get('/subjects/:id', controller.getSubject);
 router.post('/subjects', upload, controller.createSubject);
-router.put('/subjects/:id', upload, controller.updateSubject);
-router.delete('/subjects/:id', controller.deleteSubject);
+router.post('/subjects/update/:id', upload, controller.updateSubject);
+router.post('/subjects/delete/:id', controller.deleteSubject);
 
 module.exports = router;
