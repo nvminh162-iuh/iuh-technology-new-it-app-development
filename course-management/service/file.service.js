@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const { s3 } = require('../utils/aws-helper');
+const { PutObjectCommand } = require('@aws-sdk/client-s3');
 
 // Hàm randomString sẽ tạo ra một chuỗi ngẫu nhiên với độ dài numberCharacter ký tự dùng để tạo tên file
 const randomString = (numberCharacter) => {
@@ -15,6 +16,9 @@ const FILE_TYPE_MATCH = [
     'image/jpeg',
     'image/jpg',
     'image/gif',
+    'image/webp',
+    'image/jfif',
+    'image/x-jfif',
     'video/mp3',
     'video/mp4',
     'application/pdf',
@@ -26,9 +30,10 @@ const FILE_TYPE_MATCH = [
     'application/zip',
 ];
 
-const filePath = `${randomString(4)}-${new Date().getTime()}-${file?.originalname}`; // Tạo tên file mới
 
 const uploadFile = async (file) => {
+    const filePath = `${randomString(4)}-${new Date().getTime()}-${file?.originalname}`; // Tạo tên file mới
+
     // Kiểm tra loại file có phù hợp với FILE_TYPE_MATCH hay không, nếu file.metaType không nằm trong FILE_TYPE_MATCH thì throw error
     if (FILE_TYPE_MATCH.indexOf(file.mimetype) === -1) {
         throw new Error(`${file?.originalname} is invalid!`);
@@ -43,9 +48,8 @@ const uploadFile = async (file) => {
     };
 
     try {
-        const data = await s3.upload(params).promise(); // Thực hiện upload file lên AWS S3 bằng method upload
-        const fileName = `${process.env.AWS_CLOUDFRONT_URL}/${data.Key}`; // Trả về thông tin của file đã upload link file từ CloudFront URL
-        console.log(`File uploaded successfully. ${data.Location}`);
+        await s3.send(new PutObjectCommand(params)); // AWS SDK v3: dùng send() + Command
+        const fileName = `${process.env.AWS_CLOUDFRONT_URL}/${filePath}`; // Trả về URL từ CloudFront
         return fileName;
     } catch (err) {
         console.error('Error uploading file to AWS S3:', err);

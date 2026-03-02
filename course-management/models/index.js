@@ -1,4 +1,5 @@
 const { dynamodb } = require('../utils/aws-helper');
+const { PutCommand, ScanCommand, QueryCommand, UpdateCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 const { v4: uuidv4 } = require('uuid');
 
 const tableName = 'subjects';
@@ -18,7 +19,7 @@ const subjectsModel = {
             },
         };
         try {
-            await dynamodb.put(params).promise();
+            await dynamodb.send(new PutCommand(params));
             return { id: id, ...subject };
         } catch (error) {
             console.error('Error creating subject:', error);
@@ -28,7 +29,7 @@ const subjectsModel = {
     getSubjects: async () => {
         const params = { TableName: tableName };
         try {
-            const subjects = await dynamodb.scan(params).promise();
+            const subjects = await dynamodb.send(new ScanCommand(params));
             return subjects.Items;
         } catch (error) {
             console.error('Error fetching subjects:', error);
@@ -42,7 +43,7 @@ const subjectsModel = {
             ExpressionAttributeValues: { ':id': id }, // Giá trị của điều kiện trên
         };
         try {
-            const subject = await dynamodb.query(params).promise();
+            const subject = await dynamodb.send(new QueryCommand(params));
             return subject.Items[0];
         } catch (error) {
             console.error('Error getting one subject:', error);
@@ -74,8 +75,8 @@ const subjectsModel = {
             ReturnValues: 'ALL_NEW', // Trả về thông tin của subject sau khi cập nhật,  có các option khác như NONE, UPDATED_OLD, ALL_OLD
         };
         try {
-            const subject = await dynamodb.update(params).promise();
-            return subject.Attributes; // Trả về thông tin của subject sau khi cập nhật
+            const subject = await dynamodb.send(new UpdateCommand(params));
+            return subject.Attributes;
         } catch (error) {
             console.error('Error updating subject:', error);
             throw error;
@@ -90,8 +91,8 @@ const subjectsModel = {
             },
         };
         try {
-            await dynamodb.delete(params).promise();
-            return { id: id }; // Trả về thông tin của subject sau khi xoá
+            await dynamodb.send(new DeleteCommand(params));
+            return { id: id };
         } catch (error) {
             console.error('Error deleting subject:', error);
             throw error;

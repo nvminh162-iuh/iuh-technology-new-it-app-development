@@ -1,4 +1,5 @@
 const subjectsModel = require('../models');
+const { uploadFile } = require('../service/file.service');
 
 const subjectsController = {
     // Get all subjects
@@ -11,7 +12,6 @@ const subjectsController = {
             res.status(500).send('Error getting subjects');
         }
     },
-    
     // Get single subject by ID
     getSubject: async (req, res) => {
         try {
@@ -26,41 +26,24 @@ const subjectsController = {
             res.status(500).send('Error getting subject');
         }
     },
-
-    // Create subject
     createSubject: async (req, res) => {
+        const { name, type, semester, faculty } = req.body;
+        const image = req.file;
         try {
-            const newSubject = await subjectsModel.createSubject(req.body);
-            return res.status(201).json(newSubject);
+            const imageUrl = await uploadFile(image);
+            const subject = await subjectsModel.createSubject({
+                name,
+                type,
+                semester,
+                faculty,
+                image: imageUrl,
+            });
+            return res.status(200).json(subject);
         } catch (error) {
             console.log(error);
             res.status(500).send('Error creating subject');
         }
     },
-
-    // Update subject
-    updateSubject: async (req, res) => {
-        try {
-            const { id } = req.params;
-            const updatedSubject = await subjectsModel.updateSubject(id, req.body.name, req.body);
-            return res.status(200).json(updatedSubject);
-        } catch (error) {
-            console.log(error);
-            res.status(500).send('Error updating subject');
-        }
-    },
-
-    // Delete subject
-    deleteSubject: async (req, res) => {
-        try {
-            const { id } = req.params;
-            await subjectsModel.deleteSubject(id, req.body.name);
-            return res.status(200).send('Subject deleted successfully');
-        } catch (error) {
-            console.log(error);
-            res.status(500).send('Error deleting subject');
-        }
-    }
 };
 
 module.exports = subjectsController;

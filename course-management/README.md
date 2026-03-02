@@ -5,9 +5,15 @@ https://eggplant-hamster-2cc.notion.site/T-i-Li-u-H-ng-D-n-Th-c-H-nh-M-n-C-ng-Ng
 ### Tổng quan
 
 ```bash
-npm i aws-sdk ejs express express-session body-parser dotenv
+npm i @aws-sdk/client-s3 @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb ejs express express-session body-parser dotenv multer uuid
 
-yarn add aws-sdk ejs express express-session body-parser dotenv
+yarn add @aws-sdk/client-s3 @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb ejs express express-session body-parser dotenv multer uuid
+```
+
+```bash
+npm i nodemon --savedev 
+
+yarn add nodemon --dev
 ```
 
 ---
@@ -126,24 +132,35 @@ DB_PASSWORD=123456
 
 ---
 
-### 6. `aws-sdk`
+### 6. `@aws-sdk/client-s3`, `@aws-sdk/client-dynamodb`, `@aws-sdk/lib-dynamodb`
 
-- **Chức năng**: SDK chính thức của Amazon Web Services cho Node.js.
+- **Chức năng**: AWS SDK v3 cho Node.js (thay thế `aws-sdk` v2 đã end-of-support).
 - **Dùng để**:
   - Làm việc với S3 (upload/download file)
-  - Gửi email qua SES
-  - Gọi các dịch vụ AWS khác (DynamoDB, SQS, SNS, …)
-- **Ví dụ rất đơn giản với S3** (chỉ minh họa):
+  - Làm việc với DynamoDB (CRUD)
+- **Ví dụ với S3**:
 
 ```js
-const AWS = require('aws-sdk');
-AWS.config.update({ region: 'ap-southeast-1' });
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
-const s3 = new AWS.S3();
+const s3 = new S3Client({ region: 'ap-southeast-1' });
 
-s3.listBuckets((err, data) => {
-  if (err) console.log(err);
-  else console.log(data.Buckets);
-});
+await s3.send(new PutObjectCommand({
+  Bucket: 'my-bucket',
+  Key: 'file.jpg',
+  Body: fileBuffer,
+}));
 ```
----
+
+- **Ví dụ với DynamoDB**:
+
+```js
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+
+const client = new DynamoDBClient({ region: 'ap-southeast-1' });
+const dynamodb = DynamoDBDocumentClient.from(client);
+
+const result = await dynamodb.send(new ScanCommand({ TableName: 'subjects' }));
+console.log(result.Items);
+```
