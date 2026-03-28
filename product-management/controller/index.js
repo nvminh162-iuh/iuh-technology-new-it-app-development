@@ -3,7 +3,7 @@ const { computeAmount, statusLabel, computeFinalAmount, formatCurrency } = requi
 const { validation } = require("../validation")
 
 const renderAllController = async (req, res) => {
-  const { name, category } = req.query;
+  const { name, category, status } = req.query;
   let items = await findAll();
 
   if (name) {
@@ -13,6 +13,10 @@ const renderAllController = async (req, res) => {
 
   if (category && category !== "ALL") {
     items = items.filter(item => item.category === category);
+  }
+
+  if (status && status !== "ALL") {
+    items = items.filter(item => statusLabel(item?.quantity || 0) === status); //filter without dynamodb
   }
 
   return res.render("index", { items, computeAmount, statusLabel, computeFinalAmount, formatCurrency });

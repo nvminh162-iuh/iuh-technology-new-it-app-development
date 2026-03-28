@@ -3,8 +3,9 @@ const computeAmount = (price, quantity) => {
 }
 
 const statusLabel = (quantity) => {
-    if (quantity === 0) return "Hết vé";
-    else if (quantity <= 10) return "Sắp hết vé"
+    const q = Number(quantity);
+    if (q === 0) return "Hết vé";
+    else if (q <= 10) return "Sắp hết vé"
     else return "Còn vé";
 }
 
