@@ -19,7 +19,7 @@ const saveController = async (req, res) => {
   const invalid = validation(req.body);
   if (invalid) {
     const item = { ...req.body, ...(req.params.id ? { id: req.params.id } : {}) }; // gắn lại data cũ vào form
-    return res.status(400).render("form", { item, error: invalid });
+    return res.render("form", { item, error: invalid });
   }
 
   try {
