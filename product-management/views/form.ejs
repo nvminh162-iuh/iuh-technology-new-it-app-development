@@ -22,6 +22,8 @@
         <br>
         <input type="number" name="quantity" placeholder="Quantity" required value="<%= item?.quantity || '' %>">
         <br>
+        <input type="date" name="expiry" required value="<%= item?.expiry || '' %>">
+        <br>
         <select name="category">
             <option value="STANDARD" <%= item?.category === 'STANDARD' ? 'selected' : '' %>>STANDARD</option>
             <option value="PROMOTION" <%= item?.category === 'PROMOTION' ? 'selected' : '' %>>PROMOTION</option>
