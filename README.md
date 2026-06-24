@@ -18,6 +18,8 @@ Phòng: H9.2 (H (CS1))
 GV: Tôn Long Phước
 ```
 
+![point](./image.png)
+
 ```
 IUH LAB H9.2
 
